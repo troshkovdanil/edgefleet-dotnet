@@ -7,4 +7,6 @@ public class Device
     public string Name { get; init; } = string.Empty;
 
     public string Hostname { get; init; } = string.Empty;
+
+    public DeviceStatus Status { get; init; }
 }
