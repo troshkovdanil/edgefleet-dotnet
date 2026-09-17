@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using EdgeFleet.Api.Domain;
+using EdgeFleet.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,19 +9,15 @@ builder.Services.ConfigureHttpJsonOptions(options =>
         new JsonStringEnumConverter());
 });
 
-var app = builder.Build();
+builder.Services.AddSingleton<DeviceStore>();
 
-var device = new Device
-{
-    Id = Guid.NewGuid(),
-    Name = "Edge Device 01",
-    Hostname = "edge-01",
-    Status = DeviceStatus.Online,
-    LastSeenAt = DateTimeOffset.UtcNow
-};
+var app = builder.Build();
 
 app.MapGet("/", () => "EdgeFleet.NET");
 
-app.MapGet("/devices", () => new[] { device });
+app.MapGet("/devices", (DeviceStore deviceStore) =>
+{
+    return deviceStore.GetAll();
+});
 
 app.Run();
