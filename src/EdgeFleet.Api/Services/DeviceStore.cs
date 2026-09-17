@@ -20,4 +20,9 @@ public class DeviceStore
     {
         return devices;
     }
+
+    public Device? GetById(Guid id)
+    {
+        return devices.FirstOrDefault(device => device.Id == id);
+    }
 }

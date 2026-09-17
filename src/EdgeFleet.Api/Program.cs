@@ -20,4 +20,13 @@ app.MapGet("/devices", (DeviceStore deviceStore) =>
     return deviceStore.GetAll();
 });
 
+app.MapGet("/devices/{id:guid}", (Guid id, DeviceStore deviceStore) =>
+{
+    var device = deviceStore.GetById(id);
+
+    return device is null
+        ? Results.NotFound()
+        : Results.Ok(device);
+});
+
 app.Run();
