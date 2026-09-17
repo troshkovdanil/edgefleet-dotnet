@@ -11,6 +11,8 @@ builder.Services.ConfigureHttpJsonOptions(options =>
         new JsonStringEnumConverter());
 });
 
+builder.Services.AddValidation();
+
 builder.Services.AddSingleton<DeviceStore>();
 
 var app = builder.Build();
