@@ -1,2 +1,5 @@
 src/EdgeFleet.Api/obj/
 src/EdgeFleet.Api/bin/
+
+# Vim
+*.swp
