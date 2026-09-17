@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 using EdgeFleet.Api.Services;
+using EdgeFleet.Api.Domain;
+using EdgeFleet.Api.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +29,23 @@ app.MapGet("/devices/{id:guid}", (Guid id, DeviceStore deviceStore) =>
     return device is null
         ? Results.NotFound()
         : Results.Ok(device);
+});
+
+app.MapPost("/devices",
+    (RegisterDeviceRequest request, DeviceStore deviceStore) =>
+{
+    var device = new Device
+    {
+        Id = Guid.NewGuid(),
+        Name = request.Name,
+        Hostname = request.Hostname,
+        Status = DeviceStatus.Offline,
+        LastSeenAt = DateTimeOffset.UtcNow
+    };
+
+    deviceStore.Add(device);
+
+    return Results.Created($"/devices/{device.Id}", device);
 });
 
 app.Run();

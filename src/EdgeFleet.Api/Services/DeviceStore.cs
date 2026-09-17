@@ -25,4 +25,9 @@ public class DeviceStore
     {
         return devices.FirstOrDefault(device => device.Id == id);
     }
+
+    public void Add(Device device)
+    {
+        devices.Add(device);
+    }
 }
