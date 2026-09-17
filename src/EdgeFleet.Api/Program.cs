@@ -16,7 +16,8 @@ var device = new Device
     Id = Guid.NewGuid(),
     Name = "Edge Device 01",
     Hostname = "edge-01",
-    Status = DeviceStatus.Online
+    Status = DeviceStatus.Online,
+    LastSeenAt = DateTimeOffset.UtcNow
 };
 
 app.MapGet("/", () => "EdgeFleet.NET");
