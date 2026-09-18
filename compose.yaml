@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: edgefleet
+      POSTGRES_USER: edgefleet
+      POSTGRES_PASSWORD: edgefleet_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - edgefleet-postgres-data:/var/lib/postgresql
+
+volumes:
+  edgefleet-postgres-data:
