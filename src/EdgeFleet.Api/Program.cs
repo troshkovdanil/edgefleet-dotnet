@@ -60,4 +60,22 @@ app.MapPost("/devices",
     return Results.Created($"/devices/{device.Id}", device);
 });
 
+app.MapPost("/devices/{id:guid}/heartbeat",
+    async (Guid id, EdgeFleetDbContext dbContext) =>
+{
+    var device = await dbContext.Devices.FindAsync(id);
+
+    if (device is null)
+    {
+        return Results.NotFound();
+    }
+
+    device.Status = DeviceStatus.Online;
+    device.LastSeenAt = DateTimeOffset.UtcNow;
+
+    await dbContext.SaveChangesAsync();
+
+    return Results.Ok(device);
+});
+
 app.Run();

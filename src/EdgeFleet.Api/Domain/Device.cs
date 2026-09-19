@@ -8,7 +8,7 @@ public class Device
 
     public string Hostname { get; init; } = string.Empty;
 
-    public DeviceStatus Status { get; init; }
+    public DeviceStatus Status { get; set; }
 
-    public DateTimeOffset? LastSeenAt { get; init; }
+    public DateTimeOffset? LastSeenAt { get; set; }
 }
