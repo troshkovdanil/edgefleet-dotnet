@@ -2,6 +2,8 @@ using System.Text.Json.Serialization;
 using EdgeFleet.Api.Services;
 using EdgeFleet.Api.Domain;
 using EdgeFleet.Api.Contracts;
+using EdgeFleet.Api.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,14 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 });
 
 builder.Services.AddValidation();
+
+var connectionString =
+    builder.Configuration.GetConnectionString("EdgeFleet")
+    ?? throw new InvalidOperationException(
+        "Connection string 'EdgeFleet' was not found.");
+
+builder.Services.AddDbContext<EdgeFleetDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddSingleton<DeviceStore>();
 

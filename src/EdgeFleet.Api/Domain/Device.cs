@@ -10,5 +10,5 @@ public class Device
 
     public DeviceStatus Status { get; init; }
 
-    public DateTimeOffset LastSeenAt { get; init; }
+    public DateTimeOffset? LastSeenAt { get; init; }
 }
