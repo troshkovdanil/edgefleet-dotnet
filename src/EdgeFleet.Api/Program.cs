@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using EdgeFleet.Api.Services;
 using EdgeFleet.Api.Domain;
 using EdgeFleet.Api.Contracts;
 using EdgeFleet.Api.Data;
@@ -23,20 +22,19 @@ var connectionString =
 builder.Services.AddDbContext<EdgeFleetDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-builder.Services.AddSingleton<DeviceStore>();
-
 var app = builder.Build();
 
 app.MapGet("/", () => "EdgeFleet.NET");
 
-app.MapGet("/devices", (DeviceStore deviceStore) =>
+app.MapGet("/devices", async (EdgeFleetDbContext dbContext) =>
 {
-    return deviceStore.GetAll();
+    return await dbContext.Devices.ToListAsync();
 });
 
-app.MapGet("/devices/{id:guid}", (Guid id, DeviceStore deviceStore) =>
+app.MapGet("/devices/{id:guid}",
+    async (Guid id, EdgeFleetDbContext dbContext) =>
 {
-    var device = deviceStore.GetById(id);
+    var device = await dbContext.Devices.FindAsync(id);
 
     return device is null
         ? Results.NotFound()
@@ -44,7 +42,7 @@ app.MapGet("/devices/{id:guid}", (Guid id, DeviceStore deviceStore) =>
 });
 
 app.MapPost("/devices",
-    (RegisterDeviceRequest request, DeviceStore deviceStore) =>
+    async (RegisterDeviceRequest request, EdgeFleetDbContext dbContext) =>
 {
     var device = new Device
     {
@@ -52,10 +50,12 @@ app.MapPost("/devices",
         Name = request.Name,
         Hostname = request.Hostname,
         Status = DeviceStatus.Offline,
-        LastSeenAt = DateTimeOffset.UtcNow
+        LastSeenAt = null
     };
 
-    deviceStore.Add(device);
+    dbContext.Devices.Add(device);
+
+    await dbContext.SaveChangesAsync();
 
     return Results.Created($"/devices/{device.Id}", device);
 });
