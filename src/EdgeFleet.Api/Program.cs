@@ -28,13 +28,20 @@ app.MapGet("/", () => "EdgeFleet.NET");
 
 app.MapGet("/devices", async (EdgeFleetDbContext dbContext) =>
 {
-    return await dbContext.Devices.ToListAsync();
+    return await dbContext.Devices
+        .AsNoTracking()
+        .Select(DeviceResponse.Projection)
+        .ToListAsync();
 });
 
 app.MapGet("/devices/{id:guid}",
     async (Guid id, EdgeFleetDbContext dbContext) =>
 {
-    var device = await dbContext.Devices.FindAsync(id);
+    var device = await dbContext.Devices
+        .AsNoTracking()
+        .Where(device => device.Id == id)
+        .Select(DeviceResponse.Projection)
+        .FirstOrDefaultAsync();
 
     return device is null
         ? Results.NotFound()
