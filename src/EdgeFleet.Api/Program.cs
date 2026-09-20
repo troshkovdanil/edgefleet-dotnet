@@ -57,7 +57,6 @@ app.MapPost("/devices",
         Id = Guid.NewGuid(),
         Name = request.Name,
         Hostname = request.Hostname,
-        Status = DeviceStatus.Offline,
         LastSeenAt = null
     };
 
@@ -79,7 +78,6 @@ app.MapPost("/devices/{id:guid}/heartbeat",
         return Results.NotFound();
     }
 
-    device.Status = DeviceStatus.Online;
     device.LastSeenAt = DateTimeOffset.UtcNow;
 
     await dbContext.SaveChangesAsync();
