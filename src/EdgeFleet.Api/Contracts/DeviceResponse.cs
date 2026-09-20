@@ -10,6 +10,8 @@ public class DeviceResponse
 
     public string Hostname { get; init; } = string.Empty;
 
+    public string DisplayName { get; init; } = string.Empty;
+
     public DeviceStatus Status { get; init; }
 
     public DateTimeOffset? LastSeenAt { get; init; }
