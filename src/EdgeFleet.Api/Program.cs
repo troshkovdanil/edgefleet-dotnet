@@ -3,6 +3,7 @@ using EdgeFleet.Api.Domain;
 using EdgeFleet.Api.Contracts;
 using EdgeFleet.Api.Data;
 using Microsoft.EntityFrameworkCore;
+using EdgeFleet.Api.Mappers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,7 +31,7 @@ app.MapGet("/devices", async (EdgeFleetDbContext dbContext) =>
 {
     return await dbContext.Devices
         .AsNoTracking()
-        .Select(DeviceResponse.Projection)
+        .ProjectToResponse()
         .ToListAsync();
 });
 
@@ -40,7 +41,7 @@ app.MapGet("/devices/{id:guid}",
     var device = await dbContext.Devices
         .AsNoTracking()
         .Where(device => device.Id == id)
-        .Select(DeviceResponse.Projection)
+        .ProjectToResponse()
         .FirstOrDefaultAsync();
 
     return device is null
@@ -61,10 +62,11 @@ app.MapPost("/devices",
     };
 
     dbContext.Devices.Add(device);
-
     await dbContext.SaveChangesAsync();
 
-    return Results.Created($"/devices/{device.Id}", device);
+    var response = DeviceMapper.ToResponse(device);
+
+    return Results.Created($"/devices/{device.Id}", response);
 });
 
 app.MapPost("/devices/{id:guid}/heartbeat",
@@ -82,7 +84,7 @@ app.MapPost("/devices/{id:guid}/heartbeat",
 
     await dbContext.SaveChangesAsync();
 
-    return Results.Ok(device);
+    return Results.Ok(DeviceMapper.ToResponse(device));
 });
 
 app.Run();
