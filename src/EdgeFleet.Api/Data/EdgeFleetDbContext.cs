@@ -22,6 +22,9 @@ public class EdgeFleetDbContext : DbContext
 
             entity.Property(device => device.Hostname)
                 .HasMaxLength(40);
+
+            entity.HasIndex(device => device.Hostname)
+                .IsUnique();
         });
     }
 }

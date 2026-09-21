@@ -4,6 +4,7 @@ using EdgeFleet.Api.Contracts;
 using EdgeFleet.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using EdgeFleet.Api.Mappers;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,7 +62,23 @@ app.MapPost("/devices",
     };
 
     dbContext.Devices.Add(device);
-    await dbContext.SaveChangesAsync();
+
+    try
+    {
+        await dbContext.SaveChangesAsync();
+    }
+    catch (DbUpdateException exception)
+        when (exception.InnerException is PostgresException
+        {
+            SqlState: PostgresErrorCodes.UniqueViolation,
+            ConstraintName: "IX_Devices_Hostname"
+        })
+    {
+        return Results.Conflict(new
+        {
+            error = $"A device with hostname '{request.Hostname}' already exists."
+        });
+    }
 
     var response = DeviceMapper.ToResponse(device);
 
